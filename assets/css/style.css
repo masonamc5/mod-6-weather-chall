@@ -1,0 +1,83 @@
+* {
+  font-family: "Exo 2", sans-serif;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+:root {
+  --grey: #bfcfe7;
+  --blue: #525ceb;
+  --black: #3d3b40;
+  --white: #fff;
+}
+
+header {
+  background-image: url("/images/sunny.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: var(--black);
+  text-align: center;
+  width: 100vw;
+  height: 30vh;
+  padding-top: 2vh;
+  font-size: 20px;
+}
+
+body {
+  background-color: var(--black);
+}
+
+.search {
+  width: 40%;
+  margin: auto;
+}
+
+.search input,
+button {
+  text-align: center;
+  margin-top: 8vh;
+  width: 75%;
+  border: 2px solid var(--black);
+  background: transparent;
+  font-size: 20px;
+  outline: none;
+  height: 5vh;
+}
+
+.search-button {
+  width: 25%;
+  background: var(--black);
+  color: var(--white);
+  float: right;
+  border-left: 0px;
+}
+
+.search-button:hover {
+  background-color: var(--grey);
+  color: var(--black);
+}
+
+.weather {
+    display:;
+}
+
+.container1 {
+    margin: 20px;
+    width: 14.285%;
+    height: 400px;
+    background-color: var(--grey);
+}
+.container2 {
+    margin: 20px;
+    width: 14.285%;
+    height: 400px;
+    background-color: var(--grey);
+}
+.container3 {
+    margin: 20px;
+    width: 14.285%;
+    height: 400px;
+    background-color: var(--grey);
+}
+
