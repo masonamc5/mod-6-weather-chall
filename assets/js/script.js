@@ -1,84 +1,74 @@
-const weather = {
-  "api-key": "f654557b273f7dc31c27ce018d40fd1a"
-};
-
-const search = document.getElementById('search');
-const currentCity = document.getElementById('city');
+const timeEl = document.getElementById("time");
+const dateEl = document.getElementById("date");
+const currentWeatherItemsEl = document.getElementById("current-weather-items");
+const timeZone = document.getElementById("time-zone");
+const countryEl = document.getElementById("country");
+const weatherForecastEl = document.getElementById("weather-forecast");
+const currentTempEl = document.getElementById("current-temp");
+const currentCity = document.getElementById("current-city");
 const searchBar = document.getElementById("searchBar");
-const searchButton = document.getElementById('searchButton')
-const forecastCard = document.getElementById('card-body')
-const cardTitles = document.getElementsByClassName('.card-title');
-const cardSubtitles = document.getElementsByClassName('.card-subtitle');
-const cardTexts = document.getElementsByClassName('.card-text');
+const searchButton = document.getElementById("searchButton");
 
-searchButton.addEventListener('submit', getForecast)
+const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+const API_KEY = 'f654557b273f7dc31c27ce018d40fd1a';
+
+setInterval(() => {
+  const time = new Date();
+  const month = time.getMonth();
+  const date = time.getDate();
+  const day = time.getDay();
+  const hour = time.getHours();
+  const hoursIn12 = hour >= 13  ? hour %12: hour
+  const minute = time.getMinutes();
+  const ampm = hour >= 12 ? 'PM' : 'AM' //hour might have to go back to "hours"
+
+  timeEl.innerHTML = hoursIn12 + ':' + minute + '' + `<span id="am-pm">${ampm}</span>`
+
+  dateEl.innerHTML = days[day] + ', ' + months[month] + ' ' + date; 
+
+}, 1000);
+
+getForecast()
 
 function getForecast() {
-  const searchWeather = {
-    city: searchBar.value,
-    units: 'metric',
-    lang: 'en'
-  };
+  navigator.geolocation.getCurrentPosition((success) => {
+    console.log(success)
 
-  
+    let{latitude, longitude} = success.coords;
 
-  if (!searchWeather.city) {
-    alert('Please enter a valid city');
-    
-  } else {
-
-  fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${searchWeather.city}&units=${searchWeather.units}&lang=${searchWeather.lang}&appid=${weather['api-key']}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-      return response.json();
+    fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=imperial&appid=${API_KEY}`).then(res => res.json()).then(data => {
+      console.log(data)
+      showWeatherData(data)
     })
-    .then(data => {
-      handleForecastData(data);
-    })
-    .catch(error => {
-      console.error('Error fetching forecast data:', error);
-      alert('Error fetching forecast data. Please try again later.');
-    });
-
-  localStorage.setItem("searchWeather", JSON.stringify(searchWeather));
-}}
-
-
-function handleForecastData(data) {
-  console.log('Forecast data:', data);
-
-  currentCity.textContent = data.city.name;
-
-  let dayIndex = 0;
-  for (let i = 0; i < data.list.length; i++) {
-    const forecastItem = data.list[i];
-    const forecastDate = new Date(forecastItem.dt * 1000);
-
-    if (forecastDate.getHours() === 12 && dayIndex < forecastCard.length) {
-      const cardBody = forecastCard[dayIndex];
-
-      const dateElement = cardBody.querySelector('.card-subtitle');
-      const titleElement = cardBody.querySelector('.card-title');
-      const temperatureElement = cardBody.querySelector('.card-text');
-
-      console.log('Checking values:', forecastDate, titleElement, temperatureElement);
-
-
-     
-      if (dateElement && titleElement && temperatureElement) {
-        console.log('Updating elements for day:', dayIndex + 1);
-
-        dateElement.textContent = forecastDate.toDateString();
-        titleElement.textContent = `Day ${dayIndex + 1}`;
-        temperatureElement.textContent = `Temperature: ${forecastItem.main.temp}°C`;
-
-        dayIndex++;
-      } else {
-        console.error('Error: One or more elements not found.');
-      }
-    }
-  }
+  })
 }
+
+function showWeatherData(data){
+  console.log(data)
+
+  const currentForecast = data.list[0];
+  const humidity = currentForecast.main.humidity;
+  const pressure = currentForecast.main.pressure;
+  const wind_speed = currentForecast.wind.speed;
+
+  currentWeatherItemsEl.innerHTML = `
+    <div class="weather-item">
+      <div>Humidity</div>
+      <div>${humidity}%</div>
+    </div>
+    <div class="weather-item">
+      <div>Wind Speed</div>
+      <div>${wind_speed} MPH</div>
+    </div>
+    <div class="weather-item">
+      <div>Pressure</div>
+      <div>${pressure} PSI</div>
+    </div>
+  `;
+}
+
+
+
 
