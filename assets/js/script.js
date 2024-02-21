@@ -60,7 +60,7 @@ function getForecast() {
     let { latitude, longitude } = success.coords;
 
     fetch(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=imperial&appid=${API_KEY}`
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=imperial&appid=${API_KEY}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -73,15 +73,12 @@ function getForecast() {
 function showWeatherData(data) {
   console.log(data);
 
-  const dailyForecasts = data.daily;
+  const currentForecast = data.list[0];
+  const humidity = currentForecast.main.humidity;
+  const pressure = currentForecast.main.pressure;
+  const wind_speed = currentForecast.wind.speed;
 
-  if (dailyForecasts && Array.isArray(dailyForecasts)) {
-    const currentForecast = dailyForecasts[0];
-    const humidity = currentForecast.humidity;
-    const pressure = currentForecast.pressure;
-    const wind_speed = currentForecast.wind_speed;
-
-    currentWeatherItemsEl.innerHTML = `
+  currentWeatherItemsEl.innerHTML = `
     <div class="weather-item">
       <div>Humidity</div>
       <div>${humidity}%</div>
@@ -96,16 +93,16 @@ function showWeatherData(data) {
     </div>
 
   `;
-    let otherDayForecast = "";
-    data.daily.forEach((day, idx) => {
-      if (idx > 0) {
-        const date = new Date(day.dt * 1000);
-        const dayOfWeek = days[date.getDay()];
-        const highTemp = day.temp.max;
-        const lowTemp = day.temp.min;
-        const icon = day.weather[0].icon;
+  let otherDayForecast = "";
+  data.daily.forEach((day, idx) => {
+      if (idx > 0) { // Skip the current day (index 0)
+          const date = new Date(day.dt * 1000); // Convert Unix timestamp to milliseconds
+          const dayOfWeek = days[date.getDay()];
+          const highTemp = day.temp.max;
+          const lowTemp = day.temp.min;
+          const icon = day.weather[0].icon;
 
-        otherDayForecast += `
+          otherDayForecast += `
               <div class="weather-forecast-item">
                   <img
                       src="https://openweathermap.org/img/wn/${icon}@2x.png"
@@ -118,12 +115,13 @@ function showWeatherData(data) {
               </div>
           `;
       }
-    });
-
-    weatherForecastEl.innerHTML = otherDayForecast;
-  }
-
-  searchButton.addEventListener("click", function () {
-    currentCity.textContent = searchBar.value.trim();
   });
+
+  weatherForecastEl.innerHTML = otherDayForecast;
 }
+
+searchButton.addEventListener('click', function () {
+  currentCity.textContent = searchBar.value.trim();
+});
+
+
